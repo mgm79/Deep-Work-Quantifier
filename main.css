@@ -322,3 +322,19 @@ h3 {
     color: black;
     flex-direction: column;
 }
+.mdl-grid {
+	max-width: 300px;
+	margin-top: 30px;
+}
+/* custom styles */
+
+main {
+    background-image: url(./DWQ\ Drat\ 1.svg);
+    position: relative;
+    min-height: 100%;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    padding: 1em;
+  }

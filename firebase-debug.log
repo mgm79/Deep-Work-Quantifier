@@ -1,0 +1,82 @@
+[debug] [2018-07-09T12:08:52.572Z] ----------------------------------------------------------------------
+[debug] [2018-07-09T12:08:52.575Z] Command:       /usr/local/bin/node /usr/local/bin/firebase serve
+[debug] [2018-07-09T12:08:52.575Z] CLI Version:   3.19.2
+[debug] [2018-07-09T12:08:52.575Z] Platform:      darwin
+[debug] [2018-07-09T12:08:52.575Z] Node Version:  v8.9.4
+[debug] [2018-07-09T12:08:52.576Z] Time:          Mon Jul 09 2018 08:08:52 GMT-0400 (EDT)
+[debug] [2018-07-09T12:08:52.576Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-07-09T12:08:52.589Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-07-09T12:08:52.589Z] > authorizing via signed-in user
+[debug] [2018-07-09T12:08:52.592Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-07-09T12:08:52.592Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/YRIdxTU8aX0R7p7PVgSI7NllC7YvOhSySm4uzTgADNJmL65p2zKT_IfWBPcPIDl7',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Mon Jul 09 2018 08:08:52 GMT-0400 (EDT)
+[debug] [2018-07-09T12:08:52.800Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-09T12:08:52.837Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/deepworkquantifier  
+  
+ Mon Jul 09 2018 08:08:52 GMT-0400 (EDT)
+[debug] [2018-07-09T12:08:53.560Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-09T12:08:53.561Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/deepworkquantifier/tokens  
+  
+ Mon Jul 09 2018 08:08:53 GMT-0400 (EDT)
+[debug] [2018-07-09T12:08:54.044Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-09T12:08:54.045Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/deepworkquantifier  
+  
+ Mon Jul 09 2018 08:08:54 GMT-0400 (EDT)
+[debug] [2018-07-09T12:08:54.332Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/Users/Mashiku/Documents/Development/Deep-work Quantifier/AppTemplate'...
+[info] 
+[debug] [2018-07-09T12:08:54.334Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/853005894151/clients/_:getWebAppConfig  
+  
+ Mon Jul 09 2018 08:08:54 GMT-0400 (EDT)
+[debug] [2018-07-09T12:08:54.818Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] ✔  hosting: Local server: http://localhost:5000
+
+[debug] [2018-07-09T20:49:20.200Z] ----------------------------------------------------------------------
+[debug] [2018-07-09T20:49:20.204Z] Command:       /usr/local/bin/node /usr/local/bin/firebase serve
+[debug] [2018-07-09T20:49:20.204Z] CLI Version:   3.19.2
+[debug] [2018-07-09T20:49:20.204Z] Platform:      darwin
+[debug] [2018-07-09T20:49:20.204Z] Node Version:  v8.9.4
+[debug] [2018-07-09T20:49:20.206Z] Time:          Mon Jul 09 2018 16:49:20 GMT-0400 (EDT)
+[debug] [2018-07-09T20:49:20.206Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2018-07-09T20:49:20.225Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2018-07-09T20:49:20.226Z] > authorizing via signed-in user
+[debug] [2018-07-09T20:49:20.228Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2018-07-09T20:49:20.228Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ { refresh_token: '1/YRIdxTU8aX0R7p7PVgSI7NllC7YvOhSySm4uzTgADNJmL65p2zKT_IfWBPcPIDl7',
+  client_id: '563584335869-fgrhgmd47bqnekij5i8b5pr03ho849e6.apps.googleusercontent.com',
+  client_secret: 'j9iVZfS8kkCEFUPaAeJV0sAi',
+  grant_type: 'refresh_token',
+  scope: 'email https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/cloudplatformprojects.readonly https://www.googleapis.com/auth/firebase openid' } 
+ Mon Jul 09 2018 16:49:20 GMT-0400 (EDT)
+[debug] [2018-07-09T20:49:20.413Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-09T20:49:20.427Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/projects/deepworkquantifier  
+  
+ Mon Jul 09 2018 16:49:20 GMT-0400 (EDT)
+[debug] [2018-07-09T20:49:21.079Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-09T20:49:21.080Z] >>> HTTP REQUEST GET https://admin.firebase.com/v1/database/deepworkquantifier/tokens  
+  
+ Mon Jul 09 2018 16:49:21 GMT-0400 (EDT)
+[debug] [2018-07-09T20:49:32.650Z] <<< HTTP RESPONSE 200
+[debug] [2018-07-09T20:49:32.652Z] >>> HTTP REQUEST GET https://cloudresourcemanager.googleapis.com/v1/projects/deepworkquantifier  
+  
+ Mon Jul 09 2018 16:49:32 GMT-0400 (EDT)
+[debug] [2018-07-09T20:49:33.013Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from '/Users/Mashiku/Documents/Development/Deep-work Quantifier/AppTemplate'...
+[info] 
+[debug] [2018-07-09T20:49:33.016Z] >>> HTTP REQUEST GET https://mobilesdk-pa.googleapis.com/v1/projects/853005894151/clients/_:getWebAppConfig  
+  
+ Mon Jul 09 2018 16:49:33 GMT-0400 (EDT)
+[debug] [2018-07-09T20:49:33.372Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] ✔  hosting: Local server: http://localhost:5000
+
