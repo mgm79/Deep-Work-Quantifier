@@ -284,7 +284,6 @@ window.addEventListener('load', function() {
   // Saves message on form submit.
   messageForm.onsubmit = function(e) {
     e.preventDefault();
-    debugger;
     var text = messageInput.value;
     var title = titleInput.value;
     var work_date = dateInput.value;
