@@ -1,18 +1,4 @@
-/**
- * Copyright 2015 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 'use strict';
 
 
@@ -20,14 +6,18 @@
 var messageForm = document.getElementById('message-form');
 var messageInput = document.getElementById('new-post-message');
 var titleInput = document.getElementById('new-post-title');
+var dateInput = document.getElementById('new-post-date');
+var activityInput = document.getElementById('new-post-activity');
+var titleInput = document.getElementById('new-post-title');
+var locationInput = document.getElementById('new-post-location');
 var signInButton = document.getElementById('sign-in-button');
 var signOutButton = document.getElementById('sign-out-button');
 var splashPage = document.getElementById('page-splash');
 var addPost = document.getElementById('add-post');
 var addButton = document.getElementById('add');
-var recentPostsSection = document.getElementById('recent-posts-list');
-var userPostsSection = document.getElementById('user-posts-list');
-var topUserPostsSection = document.getElementById('top-user-posts-list');
+var activityLogSection = document.getElementById('activity-log');
+var calendarSection = document.getElementById('dwq-bp-calendar');
+var resultSection = document.getElementById('dwq-results');
 var recentMenuButton = document.getElementById('menu-recent');
 var myPostsMenuButton = document.getElementById('menu-my-posts');
 var myTopPostsMenuButton = document.getElementById('menu-my-top-posts');
@@ -37,15 +27,18 @@ var listeningFirebaseRefs = [];
  * Saves a new post to the Firebase DB.
  */
 // [START write_fan_out]
-function writeNewPost(uid, username, picture, title, body) {
+function writeNewPost(uid, username, picture, title, note, work_date, work_activity, work_location, dwqtime) {
   // A post entry.
   var postData = {
     author: username,
     uid: uid,
-    body: body,
     title: title,
-    starCount: 0,
-    authorPic: picture
+    authorPic: picture,
+    note: note,
+    date: work_date,
+    activity: work_activity,
+    location: work_location,
+    deepworkquantity: dwqtime
   };
 
   // Get a key for a new Post.
@@ -63,25 +56,7 @@ function writeNewPost(uid, username, picture, title, body) {
 /**
  * Star/unstar post.
  */
-// [START post_stars_transaction]
-function toggleStar(postRef, uid) {
-  postRef.transaction(function(post) {
-    if (post) {
-      if (post.stars && post.stars[uid]) {
-        post.starCount--;
-        post.stars[uid] = null;
-      } else {
-        post.starCount++;
-        if (!post.stars) {
-          post.stars = {};
-        }
-        post.stars[uid] = true;
-      }
-    }
-    return post;
-  });
-}
-// [END post_stars_transaction]
+
 
 /**
  * Creates a post element.
@@ -126,11 +101,6 @@ function createPostElement(postId, title, text, author, authorId, authorPic) {
     componentHandler.upgradeElements(postElement.getElementsByClassName('mdl-textfield')[0]);
   }
 
-  var addCommentForm = postElement.getElementsByClassName('add-comment')[0];
-  var commentInput = postElement.getElementsByClassName('new-comment')[0];
-  var star = postElement.getElementsByClassName('starred')[0];
-  var unStar = postElement.getElementsByClassName('not-starred')[0];
-
   // Set values.
   postElement.getElementsByClassName('text')[0].innerText = text;
   postElement.getElementsByClassName('mdl-card__title-text')[0].innerText = title;
@@ -138,58 +108,11 @@ function createPostElement(postId, title, text, author, authorId, authorPic) {
   postElement.getElementsByClassName('avatar')[0].style.backgroundImage = 'url("' +
       (authorPic || './silhouette.jpg') + '")';
 
-  // Listen for comments.
-  // [START child_event_listener_recycler]
-  var commentsRef = firebase.database().ref('post-comments/' + postId);
-  commentsRef.on('child_added', function(data) {
-    addCommentElement(postElement, data.key, data.val().text, data.val().author);
-  });
-
-  commentsRef.on('child_changed', function(data) {
-    setCommentValues(postElement, data.key, data.val().text, data.val().author);
-  });
-
-  commentsRef.on('child_removed', function(data) {
-    deleteComment(postElement, data.key);
-  });
-  // [END child_event_listener_recycler]
-
-  // Listen for likes counts.
-  // [START post_value_event_listener]
-  var starCountRef = firebase.database().ref('posts/' + postId + '/starCount');
-  starCountRef.on('value', function(snapshot) {
-    updateStarCount(postElement, snapshot.val());
-  });
-  // [END post_value_event_listener]
-
-  // Listen for the starred status.
-  var starredStatusRef = firebase.database().ref('posts/' + postId + '/stars/' + uid);
-  starredStatusRef.on('value', function(snapshot) {
-    updateStarredByCurrentUser(postElement, snapshot.val());
-  });
 
   // Keep track of all Firebase reference on which we are listening.
-  listeningFirebaseRefs.push(commentsRef);
-  listeningFirebaseRefs.push(starCountRef);
-  listeningFirebaseRefs.push(starredStatusRef);
+  
+  // listeningFirebaseRefs.push(starredStatusRef);
 
-  // Create new comment.
-  addCommentForm.onsubmit = function(e) {
-    e.preventDefault();
-    createNewComment(postId, firebase.auth().currentUser.displayName, uid, commentInput.value);
-    commentInput.value = '';
-    commentInput.parentElement.MaterialTextfield.boundUpdateClassesHandler();
-  };
-
-  // Bind starring action.
-  var onStarClicked = function() {
-    var globalPostRef = firebase.database().ref('/posts/' + postId);
-    var userPostRef = firebase.database().ref('/user-posts/' + authorId + '/' + postId);
-    toggleStar(globalPostRef, uid);
-    toggleStar(userPostRef, uid);
-  };
-  unStar.onclick = onStarClicked;
-  star.onclick = onStarClicked;
 
   return postElement;
 }
@@ -206,67 +129,12 @@ function createNewComment(postId, username, uid, text) {
 }
 
 /**
- * Updates the starred status of the post.
- */
-function updateStarredByCurrentUser(postElement, starred) {
-  if (starred) {
-    postElement.getElementsByClassName('starred')[0].style.display = 'inline-block';
-    postElement.getElementsByClassName('not-starred')[0].style.display = 'none';
-  } else {
-    postElement.getElementsByClassName('starred')[0].style.display = 'none';
-    postElement.getElementsByClassName('not-starred')[0].style.display = 'inline-block';
-  }
-}
-
-/**
- * Updates the number of stars displayed for a post.
- */
-function updateStarCount(postElement, nbStart) {
-  postElement.getElementsByClassName('star-count')[0].innerText = nbStart;
-}
-
-/**
- * Creates a comment element and adds it to the given postElement.
- */
-function addCommentElement(postElement, id, text, author) {
-  var comment = document.createElement('div');
-  comment.classList.add('comment-' + id);
-  comment.innerHTML = '<span class="username"></span><span class="comment"></span>';
-  comment.getElementsByClassName('comment')[0].innerText = text;
-  comment.getElementsByClassName('username')[0].innerText = author || 'Anonymous';
-
-  var commentsContainer = postElement.getElementsByClassName('comments-container')[0];
-  commentsContainer.appendChild(comment);
-}
-
-/**
- * Sets the comment's values in the given postElement.
- */
-function setCommentValues(postElement, id, text, author) {
-  var comment = postElement.getElementsByClassName('comment-' + id)[0];
-  comment.getElementsByClassName('comment')[0].innerText = text;
-  comment.getElementsByClassName('fp-username')[0].innerText = author;
-}
-
-/**
- * Deletes the comment of the given ID in the given postElement.
- */
-function deleteComment(postElement, id) {
-  var comment = postElement.getElementsByClassName('comment-' + id)[0];
-  comment.parentElement.removeChild(comment);
-}
-
-/**
  * Starts listening for new posts and populates posts lists.
  */
 function startDatabaseQueries() {
   // [START my_top_posts_query]
   var myUserId = firebase.auth().currentUser.uid;
-  var topUserPostsRef = firebase.database().ref('user-posts/' + myUserId).orderByChild('starCount');
-  // [END my_top_posts_query]
-  // [START recent_posts_query]
-  var recentPostsRef = firebase.database().ref('posts').limitToLast(100);
-  // [END recent_posts_query]
+  //create quiries
   var userPostsRef = firebase.database().ref('user-posts/' + myUserId);
 
   var fetchPosts = function(postsRef, sectionElement) {
@@ -274,7 +142,7 @@ function startDatabaseQueries() {
       var author = data.val().author || 'Anonymous';
       var containerElement = sectionElement.getElementsByClassName('posts-container')[0];
       containerElement.insertBefore(
-        createPostElement(data.key, data.val().title, data.val().body, author, data.val().uid, data.val().authorPic),
+        createPostElement(data.key, data.val().title, data.val().note, author, data.val().uid, data.val().authorPic),
         containerElement.firstChild);
     });
     postsRef.on('child_changed', function(data) {
@@ -282,7 +150,7 @@ function startDatabaseQueries() {
       var postElement = containerElement.getElementsByClassName('post-' + data.key)[0];
       postElement.getElementsByClassName('mdl-card__title-text')[0].innerText = data.val().title;
       postElement.getElementsByClassName('username')[0].innerText = data.val().author;
-      postElement.getElementsByClassName('text')[0].innerText = data.val().body;
+      postElement.getElementsByClassName('text')[0].innerText = data.val().note;
       postElement.getElementsByClassName('star-count')[0].innerText = data.val().starCount;
     });
     postsRef.on('child_removed', function(data) {
@@ -293,13 +161,12 @@ function startDatabaseQueries() {
   };
 
   // Fetching and displaying all posts of each sections.
-  fetchPosts(topUserPostsRef, topUserPostsSection);
-  fetchPosts(recentPostsRef, recentPostsSection);
-  fetchPosts(userPostsRef, userPostsSection);
+
+  fetchPosts( userPostsRef, activityLogSection);
+  
 
   // Keep track of all Firebase refs we are listening to.
-  listeningFirebaseRefs.push(topUserPostsRef);
-  listeningFirebaseRefs.push(recentPostsRef);
+  // listeningFirebaseRefs.push(topUserPostsRef);
   listeningFirebaseRefs.push(userPostsRef);
 }
 
@@ -321,9 +188,9 @@ function writeUserData(userId, name, email, imageUrl) {
  */
 function cleanupUi() {
   // Remove all previously displayed posts.
-  topUserPostsSection.getElementsByClassName('posts-container')[0].innerHTML = '';
-  recentPostsSection.getElementsByClassName('posts-container')[0].innerHTML = '';
-  userPostsSection.getElementsByClassName('posts-container')[0].innerHTML = '';
+  resultSection.getElementsByClassName('posts-container')[0].innerHTML = '';
+  activityLogSection.getElementsByClassName('posts-container')[0].innerHTML = '';
+  calendarSection.getElementsByClassName('posts-container')[0].innerHTML = '';
 
   // Stop all currently listening Firebase listeners.
   listeningFirebaseRefs.forEach(function(ref) {
@@ -364,7 +231,7 @@ function onAuthStateChanged(user) {
 /**
  * Creates a new post for the current user.
  */
-function newPostForCurrentUser(title, text) {
+function newPostForCurrentUser(title, text, work_date, work_activity, work_location, dwqtime) {
   // [START single_value_read]
   var userId = firebase.auth().currentUser.uid;
   return firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
@@ -372,7 +239,7 @@ function newPostForCurrentUser(title, text) {
     // [START_EXCLUDE]
     return writeNewPost(firebase.auth().currentUser.uid, username,
       firebase.auth().currentUser.photoURL,
-      title, text);
+      title, text, work_date, work_activity, work_location, dwqtime);
     // [END_EXCLUDE]
   });
   // [END single_value_read]
@@ -382,9 +249,9 @@ function newPostForCurrentUser(title, text) {
  * Displays the given section element and changes styling of the given button.
  */
 function showSection(sectionElement, buttonElement) {
-  recentPostsSection.style.display = 'none';
-  userPostsSection.style.display = 'none';
-  topUserPostsSection.style.display = 'none';
+  activityLogSection.style.display = 'none';
+  calendarSection.style.display = 'none';
+  resultSection.style.display = 'none';
   addPost.style.display = 'none';
   recentMenuButton.classList.remove('is-active');
   myPostsMenuButton.classList.remove('is-active');
@@ -417,26 +284,39 @@ window.addEventListener('load', function() {
   // Saves message on form submit.
   messageForm.onsubmit = function(e) {
     e.preventDefault();
+    debugger;
     var text = messageInput.value;
     var title = titleInput.value;
-    if (text && title) {
-      newPostForCurrentUser(title, text).then(function() {
+    var work_date = dateInput.value;
+    var work_activity = activityInput.value;
+    var work_location = locationInput.value;
+    var dwqtime = h1.textContent;
+    // define the time var that will hold the elipsed time taken to do a task
+    // create a dw ui with a gif launched with start button
+    // lead to gif and stop button.  Start button must trigger counter function
+    // that counts elipsed time and when stop clicked saves it and it is sent to firebase
+
+    if (text && title && dwqtime) {
+      newPostForCurrentUser(title, text, work_date, work_activity, work_location, dwqtime).then(function() {
         myPostsMenuButton.click();
       });
       messageInput.value = '';
       titleInput.value = '';
+      dateInput.value ='';
+      activityInput.value = '';
+      locationInput.value = '';
     }
   };
 
   // Bind menu buttons.
   recentMenuButton.onclick = function() {
-    showSection(recentPostsSection, recentMenuButton);
+    showSection(activityLogSection, recentMenuButton);
   };
   myPostsMenuButton.onclick = function() {
-    showSection(userPostsSection, myPostsMenuButton);
+    showSection(calendarSection, myPostsMenuButton);
   };
   myTopPostsMenuButton.onclick = function() {
-    showSection(topUserPostsSection, myTopPostsMenuButton);
+    showSection(resultSection, myTopPostsMenuButton);
   };
   addButton.onclick = function() {
     showSection(addPost);
@@ -445,3 +325,47 @@ window.addEventListener('load', function() {
   };
   recentMenuButton.onclick();
 }, false);
+
+
+
+var h1 = document.getElementsByTagName('h1')[0],
+    start = document.getElementById('start'),
+    stop = document.getElementById('stop'),
+    clear = document.getElementById('clear'),
+    seconds = 0, minutes = 0, hours = 0,
+    t;
+
+function add() {
+    seconds++;
+    if (seconds >= 60) {
+        seconds = 0;
+        minutes++;
+        if (minutes >= 60) {
+            minutes = 0;
+            hours++;
+        }
+    }
+    
+    h1.textContent = (hours ? (hours > 9 ? hours : "0" + hours) : "00") + ":" + (minutes ? (minutes > 9 ? minutes : "0" + minutes) : "00") + ":" + (seconds > 9 ? seconds : "0" + seconds);
+
+    timer();
+}
+function timer() {
+    t = setTimeout(add, 1000);
+}
+//timer(); //test function 
+
+
+/* Start button */
+start.onclick = timer;
+
+/* Stop button */
+stop.onclick = function() {
+    clearTimeout(t);
+}
+
+/* Clear button */
+clear.onclick = function() {
+    h1.textContent = "00:00:00";
+    seconds = 0; minutes = 0; hours = 0;
+}
